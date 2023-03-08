@@ -8,7 +8,7 @@ def get_db():
             current_app.config['DATABASE']
         )
 
-        g.db = client['coordinates']
+        g.db = client['mongodbcoordinates']
 
     return g.db
 
