@@ -1,9 +1,8 @@
 import functools
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, render_template, request
 )
-from werkzeug.security import check_password_hash, generate_password_hash
-from coordinates.db import get_db
+from coordinates.db import get_address_collection
 
 bp = Blueprint('address', __name__, url_prefix='/address')
 
@@ -22,6 +21,13 @@ def get_fields(fields, required_fields):
     return address, error
 
 
+@bp.route('/')
+def index():
+    address_collection = get_address_collection()
+    addresses = address_collection.find()
+    return render_template('address/index.html', addresses=addresses)
+
+
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -31,13 +37,13 @@ def register():
         address, error = get_fields(fields, required_fields)
 
         if error is None:
-            db = get_db()
-            address_collection = db['address']
+            address_collection = get_address_collection()
             try:
                 address_collection.insert_one(address)
             except Exception as e:
                 error = f'There was an error entering the requested address: {e}'
 
-        flash(error)
+        if error is not None:
+            flash(error)
 
     return render_template('address/register.html')

@@ -13,6 +13,13 @@ def get_db():
     return g.db
 
 
+def get_address_collection():
+    db = get_db()
+    address_collection = db['address']
+
+    return address_collection
+
+
 def close_db(e=None):
     db = g.pop('db', None)
 
