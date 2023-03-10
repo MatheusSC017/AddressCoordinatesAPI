@@ -11,6 +11,7 @@
       <div class="body">
         <p>{{ address['street'] }}, {{ address['number'] }} - {{ address['district'] }}</p>
         <p>{{ address['city'] }} / {{ address['state'] }} - {{ address['country'] }}</p>
+        <a class="action" href="{{ url_for('address.update', address_id=address['_id']) }}">Edit</a>
       </div>
     </article>
     {% if not loop.last %}
