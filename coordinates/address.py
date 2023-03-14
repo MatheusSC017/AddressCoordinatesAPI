@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, render_template, request, abort
+    Blueprint, flash, render_template, request, abort, redirect, url_for
 )
 from coordinates.db import get_address_collection
 from bson.objectid import ObjectId
@@ -38,6 +38,23 @@ def index():
     return render_template('address/index.html', addresses=addresses)
 
 
+@bp.route('/register', methods=('GET', 'POST'))
+def register():
+    if request.method == 'POST':
+        fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
+        required_fields = fields
+
+        address, error = get_fields(fields, required_fields)
+
+        if error is not None:
+            flash(error)
+        else:
+            address_collection = get_address_collection()
+            address_collection.insert_one(address)
+
+    return render_template('address/register.html')
+
+
 @bp.route('/<address_id>/update', methods=('GET', 'POST'))
 def update(address_id):
     if request.method == 'POST':
@@ -56,18 +73,8 @@ def update(address_id):
     return render_template('address/update.html', address=address)
 
 
-@bp.route('/register', methods=('GET', 'POST'))
-def register():
-    if request.method == 'POST':
-        fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
-        required_fields = fields
-
-        address, error = get_fields(fields, required_fields)
-
-        if error is not None:
-            flash(error)
-        else:
-            address_collection = get_address_collection()
-            address_collection.insert_one(address)
-
-    return render_template('address/register.html')
+@bp.route('/<address_id>/delete', methods=('POST', ))
+def delete(address_id):
+    address_collection = get_address_collection()
+    address_collection.delete_one({'_id': ObjectId(address_id)})
+    return redirect(url_for('address.index'))
