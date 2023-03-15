@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from .db_setup import DATABASE
+from .app_setup import DATABASE
 
 
 def create_app(test_config=None):

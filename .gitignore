@@ -130,4 +130,4 @@ dmypy.json
 
 # PyCharm
 .idea/
-/coordinates/db_setup.py
+/coordinates/app_setup.py
