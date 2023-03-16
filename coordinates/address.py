@@ -53,7 +53,7 @@ def geocoding(address):
     lat = result['results'][0]['geometry']['location']['lat']
     lng = result['results'][0]['geometry']['location']['lng']
 
-    return lat, lng
+    return [lat, lng]
 
 
 @bp.route('/')
@@ -70,7 +70,7 @@ def register():
         required_fields = fields
 
         address, error = get_fields(fields, required_fields)
-        address['coordinates'] = geocoding(address)
+        address['location'] = {'type': 'Point', 'coordinates': geocoding(address)}
 
         if error is not None:
             flash(error)
