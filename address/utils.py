@@ -2,6 +2,17 @@ from .app_setup import GOOGLE_MAPS_SECRET_KEY
 import requests
 
 
+def singleton(target_class):
+    instances = dict()
+
+    def get_class(*args, **kwargs):
+        if target_class not in instances:
+            instances[target_class] = target_class(*args, **kwargs)
+        return instances[target_class]
+
+    return get_class
+
+
 def geocoding(address):
     BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
 

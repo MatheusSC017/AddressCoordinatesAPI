@@ -3,14 +3,15 @@ from flask import (
 )
 from .utils import geocoding
 from .validations import get_fields
-from .db import *
+from .db import AddressDB
 
 bp = Blueprint('address', __name__, url_prefix='')
+address_db = AddressDB()
 
 
 @bp.route('/')
 def index():
-    addresses = get_addresses()
+    addresses = address_db.get_addresses()
     return render_template('address/index.html', addresses=addresses)
 
 
@@ -26,7 +27,7 @@ def register():
         if error is not None:
             flash(error)
         else:
-            register_address(address)
+            address_db.register_address(address)
 
     return render_template('address/register.html')
 
@@ -42,13 +43,13 @@ def update(address_id):
         if error is not None:
             flash(error)
         else:
-            update_address(address_id, address)
+            address_db.update_address(address_id, address)
 
-    address = get_address(address_id)
+    address = address_db.get_address(address_id)
     return render_template('address/update.html', address=address)
 
 
 @bp.route('/<address_id>/delete', methods=('POST', ))
 def delete(address_id):
-    delete_address(address_id)
+    address_db.delete_address(address_id)
     return redirect(url_for('address.index'))
