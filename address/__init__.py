@@ -2,14 +2,14 @@ import os
 
 from flask import Flask
 
-from .app_setup import DATABASE
+from .app_setup import DATABASE, SECRET_KEY
 
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',
+        SECRET_KEY=SECRET_KEY,
         DATABASE=DATABASE
     )
 
@@ -26,7 +26,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from . import address
-    app.register_blueprint(address.bp)
+    from . import routers
+    app.register_blueprint(routers.bp)
 
     return app
