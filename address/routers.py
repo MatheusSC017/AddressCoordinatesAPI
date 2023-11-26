@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, flash, render_template, request, redirect, url_for
 )
+from bson.json_util import dumps
 from .utils import geocoding
 from .validations import get_fields
 from .db import AddressDB
@@ -9,13 +10,13 @@ bp = Blueprint('address', __name__, url_prefix='')
 address_db = AddressDB()
 
 
-@bp.route('/')
+@bp.route('/', methods=('GET', ))
 def index():
     addresses = address_db.get_addresses()
-    return render_template('address/index.html', addresses=addresses)
+    return dumps(addresses)
 
 
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=('POST', ))
 def register():
     if request.method == 'POST':
         fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
@@ -29,10 +30,10 @@ def register():
         else:
             address_db.register_address(address)
 
-    return render_template('address/register.html')
+    return dumps("Registration created successfully")
 
 
-@bp.route('/<address_id>/update', methods=('GET', 'POST'))
+@bp.route('/<address_id>/update', methods=('POST', ))
 def update(address_id):
     if request.method == 'POST':
         fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
@@ -46,10 +47,10 @@ def update(address_id):
             address_db.update_address(address_id, address)
 
     address = address_db.get_address(address_id)
-    return render_template('address/update.html', address=address)
+    return dumps(address)
 
 
 @bp.route('/<address_id>/delete', methods=('POST', ))
 def delete(address_id):
     address_db.delete_address(address_id)
-    return redirect(url_for('address.index'))
+    return dumps("Registration deleted successfully")
