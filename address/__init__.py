@@ -1,13 +1,14 @@
 import os
-
 from flask import Flask
-
+from flask_restful import Api
 from .app_setup import DATABASE, SECRET_KEY
 
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    api = Api(app)
+
     app.config.from_mapping(
         SECRET_KEY=SECRET_KEY,
         DATABASE=DATABASE
@@ -27,6 +28,6 @@ def create_app(test_config=None):
         pass
 
     from . import routers
-    app.register_blueprint(routers.bp)
+    routers.initialize_routes(api)
 
     return app
