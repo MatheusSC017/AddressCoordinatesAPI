@@ -16,7 +16,8 @@ class AddressDB:
                 current_app.config['DATABASE']
             )
 
-            g.db = client['mongodbcoordinates']
+            g.db = client.mongodbcoordinates
+            g.db.places.create_index([("loc", pymongo.GEO2D)])
 
         return g.db
 
@@ -54,3 +55,15 @@ class AddressDB:
 
     def delete_address(self, address_id):
         self.address_collection.delete_one({'_id': ObjectId(address_id)})
+
+    def get_nearest_establishment(self, coordinates):
+        aggregation = [
+            {'$geoNear': {
+                'near': {'type': 'Point', 'coordinates': coordinates},
+                'distanceField': 'distance',
+                'query': {},
+                'spherical': True}},
+            {'$sort': {'distance': 1}},
+            {'$limit': 1}
+        ]
+        return self.address_collection.aggregate(aggregation)

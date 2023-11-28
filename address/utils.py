@@ -29,7 +29,6 @@ def geocoding(address):
     response = requests.get(BASE_URL, params=params)
     result = response.json()
 
-    print(result['results'][0]['geometry'])
     lat = result['results'][0]['geometry']['location']['lat']
     lng = result['results'][0]['geometry']['location']['lng']
 

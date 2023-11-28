@@ -13,6 +13,7 @@ address_db = AddressDB()
 def initialize_routes(api):
     api.add_resource(AddressesApi, '/api/addresses')
     api.add_resource(AddressApi, '/api/address/<id>')
+    api.add_resource(DistanceApi, '/api/distance')
 
 
 class AddressesApi(Resource):
@@ -46,7 +47,6 @@ class AddressApi(Resource):
         required_fields = fields[1:]
 
         address = {field: request.form.get(field, '') for field in fields}
-        print(address)
         errors = check_required_fields(address, required_fields)
 
         if len(errors):
@@ -60,3 +60,10 @@ class AddressApi(Resource):
     def delete(self, id):
         address_db.delete_address(id)
         return Response(dumps("Registration deleted successfully"), mimetype='application/json', status=200)
+
+
+class DistanceApi(Resource):
+    def get(self):
+        coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
+        nearest_address = address_db.get_nearest_establishment(coordinates)
+        return Response(dumps(nearest_address), mimetype='application/json', status=200)
