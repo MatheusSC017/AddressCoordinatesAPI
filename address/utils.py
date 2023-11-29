@@ -14,6 +14,11 @@ def singleton(target_class):
     return get_class
 
 
+def validate_coordinates(coordinates):
+    if not (-90 <= coordinates[0] <= 90) or not (-180 <= coordinates[1] <= 180):
+        raise ValueError("Invalid latitude or longitude value.")
+
+
 def geocoding(address):
     BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
 
@@ -29,6 +34,8 @@ def geocoding(address):
 
     response = requests.get(BASE_URL, params=params)
     result = response.json()
+    if not result['results']:
+        raise ValueError("Invalid Address, no coordinates were found for the address provided")
 
     lat = result['results'][0]['geometry']['location']['lat']
     lng = result['results'][0]['geometry']['location']['lng']
