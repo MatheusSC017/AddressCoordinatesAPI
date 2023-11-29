@@ -3,7 +3,7 @@ from flask import (
 )
 from flask_restful import Resource
 from bson.json_util import dumps
-from .utils import geocoding
+from .utils import geocoding, haversine_distance
 from .validations import check_required_fields
 from .db import AddressDB
 
@@ -25,7 +25,8 @@ class AddressesApi(Resource):
         fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
         required_fields = fields[1:]
 
-        address = {field: request.form.get(field, '') for field in fields}
+        address = {field: request.form.get(field) for field in fields if request.form.get(field)}
+        print(address)
         errors = check_required_fields(address, required_fields)
 
         if len(errors):
@@ -46,7 +47,7 @@ class AddressApi(Resource):
         fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
         required_fields = fields[1:]
 
-        address = {field: request.form.get(field, '') for field in fields}
+        address = {field: request.form.get(field) for field in fields if request.form.get(field)}
         errors = check_required_fields(address, required_fields)
 
         if len(errors):
@@ -64,6 +65,20 @@ class AddressApi(Resource):
 
 class DistanceApi(Resource):
     def get(self):
-        coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
-        nearest_address = address_db.get_nearest_establishment(coordinates)
-        return Response(dumps(nearest_address), mimetype='application/json', status=200)
+        if 'lat' in request.args.keys() and 'lng' in request.args.keys():
+            coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
+            nearest_address = address_db.get_nearest_establishment(coordinates)
+            return Response(dumps(nearest_address), mimetype='application/json', status=200)
+        elif request.content_type:
+            coordinates = request.get_json()
+            start_coordinates = geocoding(coordinates['start_address'])
+            end_coordinates = geocoding(coordinates['end_address'])
+            distance = haversine_distance(start_coordinates, end_coordinates)
+            return Response(dumps(distance), mimetype='application/json', status=200)
+        elif 'start_id_address' in request.args.keys() and 'end_id_address' in request.args.keys():
+            start_coordinates = address_db.get_address(request.args.get('start_id_address'))['location']['coordinates']
+            end_coordinates = address_db.get_address(request.args.get('end_id_address'))['location']['coordinates']
+            distance = haversine_distance(start_coordinates, end_coordinates)
+            return Response(dumps(distance), mimetype='application/json', status=200)
+
+        return Response(dumps("No search parameters were provided"), mimetype='application/json', status=400)
