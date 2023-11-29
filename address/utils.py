@@ -19,7 +19,14 @@ def validate_coordinates(coordinates):
         raise ValueError("Invalid latitude or longitude value.")
 
 
-def geocoding(address):
+def geocoding(address, region='br'):
+    """
+    Get the coordinates (latitude and longitude) for a given address using the Google Maps Geocoding API.
+
+    :param address: Dictionary containing address components (street, number, district, city, state, country).
+    :param region: The region/country code for the geocoding request. Default is 'br' (Brazil).
+    :return: List containing latitude and longitude.
+    """
     BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
 
     fields_order = ['street', 'number', 'district', 'city', 'state', 'country']
@@ -28,19 +35,24 @@ def geocoding(address):
     params = {
         'address': address_string,
         'sensor': False,
-        'region': 'br',
+        'region': region,
         'key': GOOGLE_MAPS_SECRET_KEY
     }
 
-    response = requests.get(BASE_URL, params=params)
-    result = response.json()
-    if not result['results']:
-        raise ValueError("Invalid Address, no coordinates were found for the address provided")
+    try:
+        response = requests.get(BASE_URL, params=params)
+        response.raise_for_status()
 
-    lat = result['results'][0]['geometry']['location']['lat']
-    lng = result['results'][0]['geometry']['location']['lng']
+        result = response.json()
+        if 'results' not in result or not result['results']:
+            raise ValueError("Invalid Address, no coordinates were found for the address provided")
 
-    return [lat, lng]
+        lat = result['results'][0]['geometry']['location']['lat']
+        lng = result['results'][0]['geometry']['location']['lng']
+
+        return [lat, lng]
+    except requests.exceptions.RequestException as e:
+        raise ValueError(f"Error in geocoding request: {e}")
 
 
 def haversine_distance(start_coordinate, end_coordinate):
