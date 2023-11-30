@@ -31,7 +31,7 @@ class AddressDB:
             return self._address_collection
 
         db = self.get_db()
-        db.address.create_index([("loc", pymongo.GEO2D)])
+        db.address.create_index([("location", pymongo.GEOSPHERE)])
         self._address_collection = db.address
         return self._address_collection
 

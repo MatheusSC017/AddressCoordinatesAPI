@@ -1,6 +1,4 @@
-from flask import (
-    Blueprint, flash, request, request, Response
-)
+from flask import request, Response
 from flask_restful import Resource
 from bson.json_util import dumps
 from .utils import geocoding, haversine_distance, validate_coordinates
