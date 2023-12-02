@@ -10,6 +10,8 @@ servers:
 paths:
   /api/addresses:
     get:
+      tags:
+      - Address
       summary: Returns a list of addresses
       operationId: api_addresses_get
       responses:
@@ -27,7 +29,7 @@ paths:
                   district: Urca
                   city: Rio de Janeiro
                   state: RJ
-                  country: Brasil
+                  country: Brazil
                   location:
                     type: Point
                     coordinates:
@@ -39,7 +41,7 @@ paths:
                   district: Alto da Boa Vista
                   city: Rio de Janeiro
                   state: RJ
-                  country: Brasil
+                  country: Brazil
                   location:
                     type: Point
                     coordinates:
@@ -48,10 +50,18 @@ paths:
                 items:
                   type: object
                 x-content-type: application/json
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: swagger_server.controllers.address_controller
     post:
+      tags:
+      - Address
       summary: Register an address
       operationId: api_addresses_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
       responses:
         "200":
           description: A string informing about success
@@ -61,6 +71,135 @@ paths:
                 type: string
                 example: Registration created successfully
                 x-content-type: application/json
-      x-openapi-router-controller: swagger_server.controllers.default_controller
-components: {}
+      x-openapi-router-controller: swagger_server.controllers.address_controller
+  /api/address/<id>:
+    get:
+      tags:
+      - Address
+      summary: Return an object address
+      operationId: api_addressid_get
+      responses:
+        "200":
+          description: An object informing the address and his coordinates
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  _id:
+                    $oid: 6563ab4b514febb49306a795
+                  street: Parque Nacional da Tijuca
+                  district: Alto da Boa Vista
+                  city: Rio de Janeiro
+                  state: RJ
+                  country: Brazil
+                  location:
+                    type: Point
+                    coordinates:
+                    - -22.9516393
+                    - -43.2104765
+                x-content-type: application/json
+        "404":
+          description: Error message if the object not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "An error has occurred: Address not found"
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.address_controller
+    put:
+      tags:
+      - Address
+      summary: Update an address and return an object address with the new values
+      operationId: api_addressid_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      responses:
+        "200":
+          description: An object informing the new address and his coordinates information
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  _id:
+                    $oid: 6563ab4b514febb49306a795
+                  street: Parque Nacional da Tijuca
+                  district: Alto da Boa Vista
+                  city: Rio de Janeiro
+                  state: RJ
+                  country: Brazil
+                  location:
+                    type: Point
+                    coordinates:
+                    - -22.9516393
+                    - -43.2104765
+                x-content-type: application/json
+        "400":
+          description: Error message if the object not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Invalid parameter value: "
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.address_controller
+    delete:
+      tags:
+      - Address
+      summary: Delete an address and return a message informing whether the deletion
+        process was successful
+      operationId: api_addressid_delete
+      responses:
+        "200":
+          description: Successful message
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Registration deleted successfully
+                x-content-type: application/json
+        "404":
+          description: Successful message
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "An error has occurred: Error deleting or non-existing record"
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.address_controller
+components:
+  schemas:
+    Address:
+      required:
+      - city
+      - country
+      - district
+      - state
+      - street
+      type: object
+      properties:
+        number:
+          type: string
+          example: "520"
+        street:
+          type: string
+          example: AV. Pasteur
+        district:
+          type: string
+          example: Urca
+        city:
+          type: string
+          example: Rio de janeiro
+        state:
+          type: string
+          example: RJ
+        country:
+          type: string
+          example: Brazil
 
