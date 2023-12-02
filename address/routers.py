@@ -4,6 +4,8 @@ from bson.json_util import dumps
 from .utils import geocoding, haversine_distance, validate_coordinates
 from .validations import validate_required_fields
 from .db import AddressDB
+import requests
+import json
 
 address_db = AddressDB()
 
@@ -47,7 +49,6 @@ class AddressApi(Resource):
         except Exception as e:
             return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=404)
 
-
     def put(self, id):
         try:
             fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
@@ -81,8 +82,6 @@ class ClosestDistanceApi(Resource):
             validate_coordinates(coordinates)
             nearest_address = address_db.get_nearest_establishment(coordinates)
             return Response(dumps(nearest_address), mimetype='application/json', status=200)
-        except ValueError as e:
-            return Response(dumps(f"Invalid parameter value: {str(e)}"), mimetype='application/json', status=400)
         except Exception as e:
             return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)
 
@@ -90,11 +89,12 @@ class ClosestDistanceApi(Resource):
 class AddressesDistanceApi(Resource):
     def get(self):
         try:
-            addresses = request.get_json()
-            start_coordinates = geocoding(addresses['start_address'])
-            end_coordinates = geocoding(addresses['end_address'])
+            start_coordinates = geocoding(json.loads(request.args.get('start_address')))
+            end_coordinates = geocoding(json.loads(request.args.get('end_address')))
             distance = haversine_distance(start_coordinates, end_coordinates)
             return Response(dumps(distance), mimetype='application/json', status=200)
+        except requests.exceptions.RequestException as e:
+            return Response(dumps(e), mimetype='application/json', status=400)
         except Exception as e:
             return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)
 
@@ -102,8 +102,13 @@ class AddressesDistanceApi(Resource):
 class RegisteredAddressDistanceApi(Resource):
     def get(self):
         try:
-            start_coordinates = address_db.get_address(request.args.get('start_id_address'))['location']['coordinates']
-            end_coordinates = address_db.get_address(request.args.get('end_id_address'))['location']['coordinates']
+            start_address_id = request.args.get('start_id_address')
+            end_id_address = request.args.get('end_id_address')
+            if not start_address_id or not end_id_address:
+                raise Exception("start_id_address and end_id_address are required")
+
+            start_coordinates = address_db.get_address(start_address_id)['location']['coordinates']
+            end_coordinates = address_db.get_address(end_id_address)['location']['coordinates']
             distance = haversine_distance(start_coordinates, end_coordinates)
             return Response(dumps(distance), mimetype='application/json', status=200)
         except Exception as e:
