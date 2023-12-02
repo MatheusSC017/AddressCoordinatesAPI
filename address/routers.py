@@ -11,7 +11,9 @@ address_db = AddressDB()
 def initialize_routes(api):
     api.add_resource(AddressesApi, '/api/addresses')
     api.add_resource(AddressApi, '/api/address/<id>')
-    api.add_resource(DistanceApi, '/api/distance')
+    api.add_resource(ClosestDistanceApi, '/api/distance/closest')
+    api.add_resource(AddressesDistanceApi, '/api/distance/addresses')
+    api.add_resource(RegisteredAddressDistanceApi, '/api/distance/registers')
 
 
 class AddressesApi(Resource):
@@ -43,7 +45,7 @@ class AddressApi(Resource):
             address = address_db.get_address(id)
             return Response(dumps(address), mimetype='application/json', status=200)
         except Exception as e:
-            return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)
+            return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=404)
 
 
     def put(self, id):
@@ -69,36 +71,40 @@ class AddressApi(Resource):
             address_db.delete_address(id)
             return Response(dumps("Registration deleted successfully"), mimetype='application/json', status=200)
         except Exception as e:
+            return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=404)
+
+
+class ClosestDistanceApi(Resource):
+    def get(self):
+        try:
+            coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
+            validate_coordinates(coordinates)
+            nearest_address = address_db.get_nearest_establishment(coordinates)
+            return Response(dumps(nearest_address), mimetype='application/json', status=200)
+        except ValueError as e:
+            return Response(dumps(f"Invalid parameter value: {str(e)}"), mimetype='application/json', status=400)
+        except Exception as e:
             return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)
 
 
-class DistanceApi(Resource):
+class AddressesDistanceApi(Resource):
     def get(self):
         try:
+            addresses = request.get_json()
+            start_coordinates = geocoding(addresses['start_address'])
+            end_coordinates = geocoding(addresses['end_address'])
+            distance = haversine_distance(start_coordinates, end_coordinates)
+            return Response(dumps(distance), mimetype='application/json', status=200)
+        except Exception as e:
+            return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)
 
-            if 'lat' in request.args.keys() and 'lng' in request.args.keys():
-                coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
-                validate_coordinates(coordinates)
-                nearest_address = address_db.get_nearest_establishment(coordinates)
-                return Response(dumps(nearest_address), mimetype='application/json', status=200)
 
-            elif request.content_type:
-                coordinates = request.get_json()
-                start_coordinates = geocoding(coordinates['start_address'])
-                end_coordinates = geocoding(coordinates['end_address'])
-                distance = haversine_distance(start_coordinates, end_coordinates)
-                return Response(dumps(distance), mimetype='application/json', status=200)
-
-            elif 'start_id_address' in request.args.keys() and 'end_id_address' in request.args.keys():
-                start_coordinates = address_db.get_address(request.args.get('start_id_address'))['location']['coordinates']
-                end_coordinates = address_db.get_address(request.args.get('end_id_address'))['location']['coordinates']
-                distance = haversine_distance(start_coordinates, end_coordinates)
-                return Response(dumps(distance), mimetype='application/json', status=200)
-
-            else:
-                return Response(dumps("No search parameters were provided"), mimetype='application/json', status=400)
-
-        except ValueError as e:
-            return Response(dumps(f"Invalid parameter value: {str(e)}"), mimetype='application/json', status=400)
+class RegisteredAddressDistanceApi(Resource):
+    def get(self):
+        try:
+            start_coordinates = address_db.get_address(request.args.get('start_id_address'))['location']['coordinates']
+            end_coordinates = address_db.get_address(request.args.get('end_id_address'))['location']['coordinates']
+            distance = haversine_distance(start_coordinates, end_coordinates)
+            return Response(dumps(distance), mimetype='application/json', status=200)
         except Exception as e:
             return Response(dumps(f"An error has occurred: {str(e)}"), mimetype='application/json', status=400)

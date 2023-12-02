@@ -39,7 +39,7 @@ class AddressDB:
         address = self.address_collection.find_one({'_id': ObjectId(address_id)})
 
         if address is None:
-            raise Exception('Address not found')
+            raise Exception("Address not found")
 
         return address
 
@@ -55,7 +55,7 @@ class AddressDB:
     def delete_address(self, address_id):
         result = self.address_collection.delete_one({'_id': ObjectId(address_id)})
         if result.deleted_count == 0:
-            raise Exception('Error deleting or non-existing record')
+            raise Exception("Error deleting or non-existing record")
 
     def get_nearest_establishment(self, coordinates):
         aggregation = [
