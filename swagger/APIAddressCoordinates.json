@@ -5,8 +5,14 @@
     "description": "API to manage addresses and obtain the distance that can be relative to the nearest registered address or the distance between two addresses registered or not",
     "version": "0.2.8"
   },
+  "servers": [
+    {
+      "url": "http://localhost:5000/v1",
+      "description": "Sandbox server (uses test data)"
+    }
+  ],
   "paths": {
-    "/api/addresses": {
+    "/addresses": {
       "get": {
         "summary": "Returns a list of addresses",
         "tags": [
@@ -82,12 +88,12 @@
         },
         "responses": {
           "200": {
-            "description": "A string informing about success",
+            "description": "An id of the created document",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Registration created successfully"
+                  "example": "6563ab4b514febb49306a795"
                 }
               }
             }
@@ -95,11 +101,25 @@
         }
       }
     },
-    "/api/address/<id>": {
+    "/address/{id}": {
       "get": {
         "summary": "Return an object address",
         "tags": [
           "Address"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxItems": 1
+            },
+            "style": "simple",
+            "explode": false,
+            "example": "6563ab4b514febb49306a795"
+          }
         ],
         "responses": {
           "200": {
@@ -146,6 +166,20 @@
         "summary": "Update an address and return an object address with the new values",
         "tags": [
           "Address"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxItems": 1
+            },
+            "style": "simple",
+            "explode": false,
+            "example": "6563ab4b514febb49306a795"
+          }
         ],
         "requestBody": {
           "required": true,
@@ -203,6 +237,20 @@
         "tags": [
           "Address"
         ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxItems": 1
+            },
+            "style": "simple",
+            "explode": false,
+            "example": "6563ab4b514febb49306a795"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful message",
@@ -216,12 +264,188 @@
             }
           },
           "404": {
-            "description": "Successful message",
+            "description": "Error message",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "string",
                   "example": "An error has occurred: Error deleting or non-existing record"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/distance/closest": {
+      "get": {
+        "summary": "Return an object with the closest location to the given coordinates and the distance in meters",
+        "tags": [
+          "Distance"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maxItems": 1
+            },
+            "example": -22.910288105803257
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maxItems": 1
+            },
+            "example": -43.16440758828707
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An object address with the distance that represent the closest register to the given coordinates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": [
+                    {
+                      "_id": {
+                        "$oid": "655de875051df4458d1d32be"
+                      },
+                      "number": "520",
+                      "street": "AV. Pasteur",
+                      "district": "Urca",
+                      "city": "Rio de Janeiro",
+                      "state": "RJ",
+                      "country": "Brazil",
+                      "location": {
+                        "type": "Point",
+                        "coordinates": [
+                          -22.9489641,
+                          -43.1546316
+                        ]
+                      },
+                      "distance": 26481.382810215204
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Return an error message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid parameter value: Invalid latitude or longitude value"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/distance/addresses": {
+      "get": {
+        "summary": "Return the distance between two given addresses",
+        "tags": [
+          "Distance"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start_address",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_address",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A number that represent the distance in meters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "example": 5725.929424237887
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error mesage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Error in geocoding request: Invalid Address, no coordinates were found for the address provided"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/distance/registers": {
+      "get": {
+        "summary": "Return the distance between two given registers",
+        "tags": [
+          "Distance"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start_id_address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "655de875051df4458d1d32be"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_id_address",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "6563ab4b514febb49306a795"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A number that represent the distance in meters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "example": 5725.929424237887
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "An error has occurred: Address not found"
                 }
               }
             }

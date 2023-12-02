@@ -47,7 +47,8 @@ class AddressDB:
         return self.address_collection.find()
 
     def register_address(self, address):
-        self.address_collection.insert_one(address)
+        result = self.address_collection.insert_one(address)
+        return result.inserted_id
 
     def update_address(self, address_id, address):
         self.address_collection.update_one({'_id': ObjectId(address_id)}, {'$set': address})

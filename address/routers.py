@@ -11,11 +11,11 @@ address_db = AddressDB()
 
 
 def initialize_routes(api):
-    api.add_resource(AddressesApi, '/api/addresses')
-    api.add_resource(AddressApi, '/api/address/<id>')
-    api.add_resource(ClosestDistanceApi, '/api/distance/closest')
-    api.add_resource(AddressesDistanceApi, '/api/distance/addresses')
-    api.add_resource(RegisteredAddressDistanceApi, '/api/distance/registers')
+    api.add_resource(AddressesApi, '/v1/addresses')
+    api.add_resource(AddressApi, '/v1/address/<id>')
+    api.add_resource(ClosestDistanceApi, '/v1/distance/closest')
+    api.add_resource(AddressesDistanceApi, '/v1/distance/addresses')
+    api.add_resource(RegisteredAddressDistanceApi, '/v1/distance/registers')
 
 
 class AddressesApi(Resource):
@@ -32,9 +32,8 @@ class AddressesApi(Resource):
             validate_required_fields(address, required_fields)
 
             address['location'] = {'type': 'Point', 'coordinates': geocoding(address)}
-            address_db.register_address(address)
-
-            return Response(dumps("Registration created successfully"), mimetype='application/json', status=200)
+            address_id = address_db.register_address(address)
+            return Response(dumps(str(address_id)), mimetype='application/json', status=200)
         except ValueError as e:
             return Response(dumps(f"Invalid parameter value: {str(e)}"), mimetype='application/json', status=400)
         except Exception as e:
