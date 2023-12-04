@@ -130,4 +130,4 @@ dmypy.json
 
 # PyCharm
 .idea/
-/address/app_setup.py
+/address/config.py

@@ -1,17 +1,32 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask
 from flask_restful import Api
-from .app_setup import DATABASE, SECRET_KEY
+from . import routers
+
+# Load variables from the .env file into the environment
+load_dotenv()
 
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    configure_app(app, test_config)
     api = Api(app)
+    routers.initialize_routes(api)
+    return app
+
+
+def configure_app(app, test_config):
+    secret_key = os.getenv('SECRET_KEY')
+    mongo_uri = os.getenv('MONGO_URI')
+
+    if not secret_key or not mongo_uri:
+        raise ValueError("Missing required configuration values")
 
     app.config.from_mapping(
-        SECRET_KEY=SECRET_KEY,
-        DATABASE=DATABASE
+        SECRET_KEY=secret_key,
+        MONGO_URI=mongo_uri
     )
 
     if test_config is None:
@@ -26,8 +41,3 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    from . import routers
-    routers.initialize_routes(api)
-
-    return app

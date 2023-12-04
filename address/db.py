@@ -1,21 +1,19 @@
 import pymongo
 from bson.objectid import ObjectId
 from flask import current_app, g
+from flask_pymongo import PyMongo
 from .utils import singleton
 
 
 @singleton
 class AddressDB:
-    db = None
+    mongodb = None
     _address_collection = None
 
     def get_db(self):
         if 'db' not in g:
-            client = pymongo.MongoClient(
-                current_app.config['DATABASE']
-            )
-
-            g.db = client.mongodbcoordinates
+            self.mongodb = PyMongo(current_app)
+            g.db = self.mongodb.db
 
         return g.db
 

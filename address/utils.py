@@ -1,6 +1,6 @@
-from .app_setup import GOOGLE_MAPS_SECRET_KEY
 import requests
 import math
+import os
 
 
 def singleton(target_class):
@@ -36,7 +36,7 @@ def geocoding(address, region='br'):
         'address': address_string,
         'sensor': False,
         'region': region,
-        'key': GOOGLE_MAPS_SECRET_KEY
+        'key': os.environ.get('GOOGLE_MAPS_SECRET_KEY')
     }
 
     try:
