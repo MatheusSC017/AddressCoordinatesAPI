@@ -9,6 +9,9 @@ import json
 
 address_db = AddressDB()
 
+fields = ['complement', 'cep', 'number', 'street', 'district', 'city', 'state', 'country', ]
+required_fields = fields[3:]
+
 
 def initialize_routes(api):
     api.add_resource(AddressesApi, '/v1/addresses')
@@ -25,9 +28,6 @@ class AddressesApi(Resource):
 
     def post(self):
         try:
-            fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
-            required_fields = fields[1:]
-
             address = {field: request.form.get(field) for field in fields if request.form.get(field)}
             validate_required_fields(address, required_fields)
 
@@ -50,9 +50,6 @@ class AddressApi(Resource):
 
     def put(self, id):
         try:
-            fields = ['number', 'street', 'district', 'city', 'state', 'country', ]
-            required_fields = fields[1:]
-
             address = {field: request.form.get(field) for field in fields if request.form.get(field)}
             validate_required_fields(address, required_fields)
 

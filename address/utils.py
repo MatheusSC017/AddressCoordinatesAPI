@@ -29,7 +29,7 @@ def geocoding(address, region='br'):
     """
     BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
 
-    fields_order = ['street', 'number', 'district', 'city', 'state', 'country']
+    fields_order = ['street', 'number', 'complement', 'district', 'city', 'state', 'cep', 'country']
     address_string = ', '.join([str(address.get(field)) for field in fields_order if address.get(field)])
 
     params = {
