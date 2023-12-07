@@ -14,11 +14,13 @@ class Address(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, number: str=None, street: str=None, district: str=None, city: str=None, state: str=None, country: str=None):  # noqa: E501
+    def __init__(self, number: str=None, complement: str=None, street: str=None, district: str=None, city: str=None, state: str=None, country: str=None, cep: str=None):  # noqa: E501
         """Address - a model defined in Swagger
 
         :param number: The number of this Address.  # noqa: E501
         :type number: str
+        :param complement: The complement of this Address.  # noqa: E501
+        :type complement: str
         :param street: The street of this Address.  # noqa: E501
         :type street: str
         :param district: The district of this Address.  # noqa: E501
@@ -29,30 +31,38 @@ class Address(Model):
         :type state: str
         :param country: The country of this Address.  # noqa: E501
         :type country: str
+        :param cep: The cep of this Address.  # noqa: E501
+        :type cep: str
         """
         self.swagger_types = {
             'number': str,
+            'complement': str,
             'street': str,
             'district': str,
             'city': str,
             'state': str,
-            'country': str
+            'country': str,
+            'cep': str
         }
 
         self.attribute_map = {
             'number': 'number',
+            'complement': 'complement',
             'street': 'street',
             'district': 'district',
             'city': 'city',
             'state': 'state',
-            'country': 'country'
+            'country': 'country',
+            'cep': 'cep'
         }
         self._number = number
+        self._complement = complement
         self._street = street
         self._district = district
         self._city = city
         self._state = state
         self._country = country
+        self._cep = cep
 
     @classmethod
     def from_dict(cls, dikt) -> 'Address':
@@ -85,6 +95,27 @@ class Address(Model):
         """
 
         self._number = number
+
+    @property
+    def complement(self) -> str:
+        """Gets the complement of this Address.
+
+
+        :return: The complement of this Address.
+        :rtype: str
+        """
+        return self._complement
+
+    @complement.setter
+    def complement(self, complement: str):
+        """Sets the complement of this Address.
+
+
+        :param complement: The complement of this Address.
+        :type complement: str
+        """
+
+        self._complement = complement
 
     @property
     def street(self) -> str:
@@ -200,3 +231,24 @@ class Address(Model):
             raise ValueError("Invalid value for `country`, must not be `None`")  # noqa: E501
 
         self._country = country
+
+    @property
+    def cep(self) -> str:
+        """Gets the cep of this Address.
+
+
+        :return: The cep of this Address.
+        :rtype: str
+        """
+        return self._cep
+
+    @cep.setter
+    def cep(self, cep: str):
+        """Sets the cep of this Address.
+
+
+        :param cep: The cep of this Address.
+        :type cep: str
+        """
+
+        self._cep = cep

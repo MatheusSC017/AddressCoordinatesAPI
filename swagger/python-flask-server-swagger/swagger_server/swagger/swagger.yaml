@@ -358,6 +358,9 @@ components:
         number:
           type: string
           example: "520"
+        complement:
+          type: string
+          example: Atração turistica
         street:
           type: string
           example: AV. Pasteur
@@ -373,4 +376,7 @@ components:
         country:
           type: string
           example: Brazil
+        cep:
+          type: string
+          example: 22290-255
 
