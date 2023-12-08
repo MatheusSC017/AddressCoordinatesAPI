@@ -5,10 +5,10 @@ from flask_pymongo import PyMongo
 from .utils import singleton
 
 
-@singleton
-class AddressDB:
+class MongoDB:
+    _collection_name = None
+    _collection = None
     mongodb = None
-    _address_collection = None
 
     def get_db(self):
         if 'db' not in g:
@@ -24,17 +24,31 @@ class AddressDB:
             db.close()
 
     @property
-    def address_collection(self):
-        if self._address_collection is not None:
-            return self._address_collection
+    def collection(self):
+        if self._collection is not None:
+            return self._collection
 
         db = self.get_db()
-        db.address.create_index([("location", pymongo.GEOSPHERE)])
-        self._address_collection = db.address
-        return self._address_collection
+        self._collection = db[self._collection_name]
+        return self._collection
+
+
+@singleton
+class AddressDB(MongoDB):
+    _collection_name = "address"
+
+    @property
+    def collection(self):
+        if self._collection is not None:
+            return self._collection
+
+        db = self.get_db()
+        db[self._collection_name].create_index([("location", pymongo.GEOSPHERE)])
+        self._collection = db[self._collection_name]
+        return self._collection
 
     def get_address(self, address_id):
-        address = self.address_collection.find_one({'_id': ObjectId(address_id)})
+        address = self.collection.find_one({'_id': ObjectId(address_id)})
 
         if address is None:
             raise Exception("Address not found")
@@ -42,17 +56,17 @@ class AddressDB:
         return address
 
     def get_addresses(self):
-        return self.address_collection.find()
+        return self.collection.find()
 
     def register_address(self, address):
-        result = self.address_collection.insert_one(address)
+        result = self.collection.insert_one(address)
         return result.inserted_id
 
     def update_address(self, address_id, address):
-        self.address_collection.update_one({'_id': ObjectId(address_id)}, {'$set': address})
+        self.collection.update_one({'_id': ObjectId(address_id)}, {'$set': address})
 
     def delete_address(self, address_id):
-        result = self.address_collection.delete_one({'_id': ObjectId(address_id)})
+        result = self.collection.delete_one({'_id': ObjectId(address_id)})
         if result.deleted_count == 0:
             raise Exception("Error deleting or non-existing record")
 
@@ -66,4 +80,4 @@ class AddressDB:
             {'$sort': {'distance': 1}},
             {'$limit': 1}
         ]
-        return self.address_collection.aggregate(aggregation)
+        return self.collection.aggregate(aggregation)
