@@ -1,9 +1,10 @@
-from flask import request, Response, jsonify
+from flask import request, Response
 from flask_restful import Resource
 from bson.json_util import dumps
 from .utils import geocoding, haversine_distance, validate_coordinates
 from .validations import validate_required_fields
 from .db import AddressDB
+from .security import token_required
 import requests
 import json
 
@@ -22,10 +23,12 @@ def initialize_routes(api):
 
 
 class AddressesApi(Resource):
+    @token_required
     def get(self):
         addresses = address_db.get_addresses()
         return Response(dumps(addresses), mimetype='application/json', status=200)
 
+    @token_required
     def post(self):
         try:
             address = {field: request.form.get(field) for field in fields if request.form.get(field)}
@@ -33,21 +36,23 @@ class AddressesApi(Resource):
 
             address['location'] = {'type': 'Point', 'coordinates': geocoding(address)}
             address_id = address_db.register_address(address)
-            return Response(jsonify(str(address_id)), mimetype='application/json', status=200)
+            return Response(dumps(str(address_id)), mimetype='application/json', status=200)
         except ValueError as e:
-            return Response(jsonify({"error": f"Invalid parameter value: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"Invalid parameter value: {str(e)}"}), mimetype='application/json', status=400)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
 
 
 class AddressApi(Resource):
+    @token_required
     def get(self, id):
         try:
             address = address_db.get_address(id)
             return Response(dumps(address), mimetype='application/json', status=200)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=404)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=404)
 
+    @token_required
     def put(self, id):
         try:
             address = {field: request.form.get(field) for field in fields if request.form.get(field)}
@@ -59,43 +64,47 @@ class AddressApi(Resource):
             address = address_db.get_address(id)
             return Response(dumps(address), mimetype='application/json', status=200)
         except ValueError as e:
-            return Response(jsonify({"error": f"Invalid parameter value: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"Invalid parameter value: {str(e)}"}), mimetype='application/json', status=400)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
 
+    @token_required
     def delete(self, id):
         try:
             address_db.delete_address(id)
-            return Response(jsonify({"successful": "Registration deleted successfully"}), mimetype='application/json', status=200)
+            return Response(dumps({"successful": "Registration deleted successfully"}), mimetype='application/json', status=200)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=404)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=404)
 
 
 class ClosestDistanceApi(Resource):
+    @token_required
     def get(self):
         try:
             coordinates = [float(request.args.get('lat')), float(request.args.get('lng'))]
             validate_coordinates(coordinates)
             nearest_address = address_db.get_nearest_establishment(coordinates)
-            return Response(jsonify({"distance": nearest_address}), mimetype='application/json', status=200)
+            return Response(dumps({"distance": nearest_address}), mimetype='application/json', status=200)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
 
 
 class AddressesDistanceApi(Resource):
+    @token_required
     def get(self):
         try:
             start_coordinates = geocoding(json.loads(request.args.get('start_address')))
             end_coordinates = geocoding(json.loads(request.args.get('end_address')))
             distance = haversine_distance(start_coordinates, end_coordinates)
-            return Response(jsonify({"distance": distance}), mimetype='application/json', status=200)
+            return Response(dumps({"distance": distance}), mimetype='application/json', status=200)
         except requests.exceptions.RequestException as e:
-            return Response(jsonify({"error": e}), mimetype='application/json', status=400)
+            return Response(dumps({"error": e}), mimetype='application/json', status=400)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
 
 
 class RegisteredAddressDistanceApi(Resource):
+    @token_required
     def get(self):
         try:
             start_address_id = request.args.get('start_id_address')
@@ -106,6 +115,6 @@ class RegisteredAddressDistanceApi(Resource):
             start_coordinates = address_db.get_address(start_address_id)['location']['coordinates']
             end_coordinates = address_db.get_address(end_id_address)['location']['coordinates']
             distance = haversine_distance(start_coordinates, end_coordinates)
-            return Response(jsonify({"distance": distance}), mimetype='application/json', status=200)
+            return Response(dumps({"distance": distance}), mimetype='application/json', status=200)
         except Exception as e:
-            return Response(jsonify({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)
+            return Response(dumps({"error": f"An error has occurred: {str(e)}"}), mimetype='application/json', status=400)

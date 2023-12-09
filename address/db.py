@@ -35,7 +35,7 @@ class MongoDB:
 
 @singleton
 class AddressDB(MongoDB):
-    _collection_name = "address"
+    _collection_name = 'address'
 
     @property
     def collection(self):
@@ -81,3 +81,12 @@ class AddressDB(MongoDB):
             {'$limit': 1}
         ]
         return self.collection.aggregate(aggregation)
+
+
+@singleton
+class UserDB(MongoDB):
+    _collection_name = 'users'
+
+    def get_user(self, user_id):
+        user = self.collection.find_one({'_id': ObjectId(user_id)})
+        return user
