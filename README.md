@@ -8,4 +8,4 @@ Key technologies employed in the construction of this API include:
 - Pymongo (MongoDB)
 - Dotenv
 
-Regarding the available endpoints, you can view them in the Swagger documentation at this [link](https://address-coordinates-311e8746b94e.herokuapp.com/v1/ui/)
+Regarding the available endpoints, you can view them in the Swagger documentation at this [link](https://address-coordinates-cd0a1a6282b5.herokuapp.com/v1/ui/)
