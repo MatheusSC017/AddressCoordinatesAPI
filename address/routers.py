@@ -36,7 +36,7 @@ class AddressesApi(Resource):
 
             address['location'] = {'type': 'Point', 'coordinates': geocoding(address)}
             address_id = address_db.register_address(address)
-            return Response(dumps(str(address_id)), mimetype='application/json', status=200)
+            return Response(dumps({"address_id": str(address_id)}), mimetype='application/json', status=200)
         except ValueError as e:
             return Response(dumps({"error": f"Invalid parameter value: {str(e)}"}), mimetype='application/json', status=400)
         except Exception as e:

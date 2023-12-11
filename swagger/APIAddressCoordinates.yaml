@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Addresses and Coordinates
   description: API to manage addresses and obtain the distance that can be relative to the nearest registered address or the distance between two addresses registered or not
-  version: 0.2.8
+  version: 0.2.15
 
 servers:
   - url: "http://localhost:5000/v1"
@@ -14,6 +14,8 @@ paths:
       summary: Returns a list of addresses
       tags:
         - Address
+      security:
+        - ApiKeyAuth: [token, ]
       responses:
         '200': 
           description: A JSON array of addresses information and coordinates
@@ -49,6 +51,8 @@ paths:
       summary: Register an address
       tags:
         - Address
+      security:
+        - ApiKeyAuth: [token, ]
       requestBody:
         required: true
         content:
@@ -62,12 +66,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: 6563ab4b514febb49306a795
+                example: {"address_id": "6563ab4b514febb49306a795"}
   /address/{id}:
     get:
       summary: Return an object address
       tags:
         - Address
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: path
           name: id
@@ -102,11 +108,13 @@ paths:
             application/json:
               schema:
                 type: string
-                example: "An error has occurred: Address not found"
+                example: {"error": "An error has occurred: Address not found"}
     put:
       summary: Update an address and return an object address with the new values
       tags:
         - Address
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: path
           name: id
@@ -147,11 +155,13 @@ paths:
             application/json:
               schema:
                 type: string
-                example: "Invalid parameter value: "
+                example: {"error": "Invalid parameter value: "}
     delete:
       summary: Delete an address and return a message informing whether the deletion process was successful
       tags:
         - Address
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: path
           name: id
@@ -169,19 +179,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Registration deleted successfully
+                example: {"succesfull": "Registration deleted successfully"}
         '404':
           description: Error message
           content:
             application/json:
               schema:
                 type: string
-                example: "An error has occurred: Error deleting or non-existing record"
+                example: {"error": "An error has occurred: Error deleting or non-existing record"}
   /distance/closest:
     get:
       summary: Return an object with the closest location to the given coordinates and the distance in meters
       tags:
         - Distance
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: query
           name: lat
@@ -223,12 +235,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: "Invalid parameter value: Invalid latitude or longitude value"
+                example: {"error": "Invalid parameter value: Invalid latitude or longitude value"}
   /distance/addresses:
     get:
       summary: Return the distance between two given addresses
       tags:
         - Distance
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: query
           name: start_address
@@ -247,19 +261,21 @@ paths:
             application/json:
               schema:
                 type: number
-                example: 5725.929424237887
+                example: {"distance": 5725.929424237887}
         '400':
           description: Error mesage
           content:
             application/json:
               schema:
                 type: string
-                example: "Error in geocoding request: Invalid Address, no coordinates were found for the address provided"
+                example: {"error": "Error in geocoding request: Invalid Address, no coordinates were found for the address provided"}
   /distance/registers:
     get:
       summary: Return the distance between two given registers
       tags:
         - Distance
+      security:
+        - ApiKeyAuth: [token, ]
       parameters:
         - in: query
           name: start_id_address
@@ -280,16 +296,21 @@ paths:
             application/json:
               schema:
                 type: number
-                example: 5725.929424237887
+                example: {"distance": 5725.929424237887}
         '400':
           description: Error message
           content:
             application/json:
               schema:
                 type: string
-                example: "An error has occurred: Address not found"
+                example: {"error": "An error has occurred: Address not found"}
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: token
   schemas:
     Address:
       type: object

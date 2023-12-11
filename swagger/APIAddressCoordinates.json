@@ -3,7 +3,7 @@
   "info": {
     "title": "Addresses and Coordinates",
     "description": "API to manage addresses and obtain the distance that can be relative to the nearest registered address or the distance between two addresses registered or not",
-    "version": "0.2.8"
+    "version": "0.2.15"
   },
   "servers": [
     {
@@ -17,6 +17,13 @@
         "summary": "Returns a list of addresses",
         "tags": [
           "Address"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "responses": {
           "200": {
@@ -76,6 +83,13 @@
         "tags": [
           "Address"
         ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -93,7 +107,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "6563ab4b514febb49306a795"
+                  "example": {
+                    "address_id": "6563ab4b514febb49306a795"
+                  }
                 }
               }
             }
@@ -106,6 +122,13 @@
         "summary": "Return an object address",
         "tags": [
           "Address"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -155,7 +178,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "An error has occurred: Address not found"
+                  "example": {
+                    "error": "An error has occurred: Address not found"
+                  }
                 }
               }
             }
@@ -166,6 +191,13 @@
         "summary": "Update an address and return an object address with the new values",
         "tags": [
           "Address"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -225,7 +257,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Invalid parameter value: "
+                  "example": {
+                    "error": "Invalid parameter value: "
+                  }
                 }
               }
             }
@@ -236,6 +270,13 @@
         "summary": "Delete an address and return a message informing whether the deletion process was successful",
         "tags": [
           "Address"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -258,7 +299,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Registration deleted successfully"
+                  "example": {
+                    "succesfull": "Registration deleted successfully"
+                  }
                 }
               }
             }
@@ -269,7 +312,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "An error has occurred: Error deleting or non-existing record"
+                  "example": {
+                    "error": "An error has occurred: Error deleting or non-existing record"
+                  }
                 }
               }
             }
@@ -282,6 +327,13 @@
         "summary": "Return an object with the closest location to the given coordinates and the distance in meters",
         "tags": [
           "Distance"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -343,7 +395,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Invalid parameter value: Invalid latitude or longitude value"
+                  "example": {
+                    "error": "Invalid parameter value: Invalid latitude or longitude value"
+                  }
                 }
               }
             }
@@ -356,6 +410,13 @@
         "summary": "Return the distance between two given addresses",
         "tags": [
           "Distance"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -382,7 +443,9 @@
               "application/json": {
                 "schema": {
                   "type": "number",
-                  "example": 5725.929424237887
+                  "example": {
+                    "distance": 5725.929424237887
+                  }
                 }
               }
             }
@@ -393,7 +456,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Error in geocoding request: Invalid Address, no coordinates were found for the address provided"
+                  "example": {
+                    "error": "Error in geocoding request: Invalid Address, no coordinates were found for the address provided"
+                  }
                 }
               }
             }
@@ -406,6 +471,13 @@
         "summary": "Return the distance between two given registers",
         "tags": [
           "Distance"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [
+              "token"
+            ]
+          }
         ],
         "parameters": [
           {
@@ -434,7 +506,9 @@
               "application/json": {
                 "schema": {
                   "type": "number",
-                  "example": 5725.929424237887
+                  "example": {
+                    "distance": 5725.929424237887
+                  }
                 }
               }
             }
@@ -445,7 +519,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "An error has occurred: Address not found"
+                  "example": {
+                    "error": "An error has occurred: Address not found"
+                  }
                 }
               }
             }
@@ -455,6 +531,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
+      }
+    },
     "schemas": {
       "Address": {
         "type": "object",
