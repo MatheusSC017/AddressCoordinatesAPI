@@ -35,7 +35,7 @@ class MongoDB:
 
 @singleton
 class AddressDB(MongoDB):
-    _collection_name = 'address'
+    _collection_name = 'addresses'
 
     @property
     def collection(self):
