@@ -47,3 +47,7 @@ The purpose of each parameter is described below
 
 6. The final step is to run the application, to do this run the command below:
 > flask --app address run 
+
+## Obtaining an API Key Token
+
+To get an API key token, run the ApiKey.py file and enter the name you want to use as identification, it will print the JWT token at the prompt that you can use

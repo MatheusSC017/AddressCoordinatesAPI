@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 import pymongo
 import os
 import jwt
-import json
 
 load_dotenv()
 
