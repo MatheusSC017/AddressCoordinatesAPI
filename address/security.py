@@ -1,10 +1,8 @@
 from flask import request, current_app, Response
 from functools import wraps
-from bson.json_util import dumps
-from .db import UserDB
+from json import dumps
+from .db import get_user
 import jwt
-
-userdb = UserDB()
 
 
 def token_required(f):
@@ -17,8 +15,8 @@ def token_required(f):
                             status=401)
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user_id = data['user_id']
-            user = userdb.get_user(current_user_id)
+            user = get_user(data['user_id'], data['username'])
+
             if user is None:
                 return Response(dumps({"error": "Invalid payload entered or user does not exist"}),
                                 mimetype='application/json',

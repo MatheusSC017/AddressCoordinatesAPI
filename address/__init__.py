@@ -19,14 +19,12 @@ def create_app(test_config=None):
 
 def configure_app(app, test_config):
     secret_key = os.getenv('SECRET_KEY')
-    mongo_uri = os.getenv('MONGO_URI')
 
-    if not secret_key or not mongo_uri:
+    if not secret_key:
         raise ValueError("Missing required configuration values")
 
     app.config.from_mapping(
-        SECRET_KEY=secret_key,
-        MONGO_URI=mongo_uri
+        SECRET_KEY=secret_key
     )
 
     if test_config is None:
