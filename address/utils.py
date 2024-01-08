@@ -14,6 +14,11 @@ def singleton(target_class):
     return get_class
 
 
+def validate_coordinates(coordinates):
+    if not (-90 <= coordinates[0] <= 90) or not (-180 <= coordinates[1] <= 180):
+        raise ValueError("Invalid latitude or longitude value.")
+
+
 def geocoding(address, region='br'):
     """
     Get the coordinates (latitude and longitude) for a given address using the Google Maps Geocoding API.
