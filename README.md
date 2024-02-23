@@ -1,4 +1,10 @@
 # Address Coordinates API
+
+![Linguagem mais usada](https://img.shields.io/github/languages/top/MatheusSC017/AddressCoordinatesAPI)
+![Numero de lingaugens usadas](https://img.shields.io/github/languages/count/MatheusSC017/AddressCoordinatesAPI)
+![Lincense](https://img.shields.io/github/license/MatheusSC017/AddressCoordinatesAPI)
+![Tamanho do projeto](https://img.shields.io/github/languages/code-size/MatheusSC017/AddressCoordinatesAPI)
+
 This API has been developed with the specific intent of serving as a microservice within another project featured in my portfolio.
 
 ## Technologies
