@@ -16,7 +16,7 @@ Key technologies employed in the construction of this API include:
 - Dotenv
 
 ## Documentation
-Regarding the available endpoints, you can view them in the Swagger documentation at this [link](https://address-coordinates-cd0a1a6282b5.herokuapp.com/v1/ui/)
+Regarding the available endpoints, you can view them in the Swagger documentation at this [link](https://address-coordinates-cd0a1a6282b5.herokuapp.com/v1/ui/) (Link temporarily disabled)
 
 ## Requirements
 To run this project, make sure you have the below software installed on your device
